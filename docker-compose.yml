@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app/
+    container_name: app_hive_mike
+    depends_on:
+      - database
+    command: "php -S 0.0.0.0:80"
+    ports:
+      - "80:80"
+    networks:
+      hive-network:
+        aliases:
+          - app
+
+  database:
+    build: ./database/
+    restart: always
+    container_name: database_hive_mike
+    environment:
+      MYSQL_DATABASE: hive
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ROOT_PASSWORD: ""
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      hive-network:
+        aliases:
+          - database
+
+networks:
+  hive-network:
+
+
+volumes:
+  mysql-data:
