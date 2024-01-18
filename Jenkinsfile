@@ -22,10 +22,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    withSonarQubeEnv('SonarQubeServer') {
-                        sh 'sonar-scanner -Dsonar.projectKey=my-php-project -Dsonar.sources=. -Dsonar.php.tests.reportPath=build/logs/junit.xml -Dsonar.php.coverage.reportPaths=build/logs/clover.xml -Dsonar.host.url=http://localhost:9000 -Dsonar.login='
-                    }
+                withSonarQubeEnv('Hive-SonarQube-Server') {
+                    sh 'Hive-SonarQube-Scanner/bin/sonar-scanner -Dsonar.projectKey=my-php-project -Dsonar.sources=. -Dsonar.php.tests.reportPath=build/logs/junit.xml -Dsonar.php.coverage.reportPaths=build/logs/clover.xml -Dsonar.host.url=http://localhost:9000 -Dsonar.login='
                 }
             }
         }
