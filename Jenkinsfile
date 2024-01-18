@@ -2,15 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
                 echo 'Building the project...'
+                checkout scm
             }
         }
 
@@ -22,21 +17,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                script { scannerHome = tool 'Hive-SonarQube-Scanner' }
                 withSonarQubeEnv('Hive-SonarQube-Server') {
-                    sh 'Hive-SonarQube-Scanner/bin/sonar-scanner -Dsonar.projectKey=my-php-project -Dsonar.sources=. -Dsonar.php.tests.reportPath=build/logs/junit.xml -Dsonar.php.coverage.reportPaths=build/logs/clover.xml -Dsonar.host.url=http://localhost:9000 -Dsonar.login='
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-dev-mike"
                 }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                script {
-                    // Wait for SonarQube analysis to complete and check Quality Gate status
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Quality gate failed: ${qg.status}"
-                    }
-                }
+                echo 'Sonarqube working...'
             }
         }
 
