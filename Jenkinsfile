@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script { scannerHome = tool 'Hive-SonarQube-Scanner' }
                 withSonarQubeEnv('Hive-SonarQube-Server') {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-dev-mike"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-dev-mike -Dsonar.login=squ_25844deed3a28da6371302d287dba553f8563fd3"
                 }
                 echo 'Sonarqube working...'
             }
