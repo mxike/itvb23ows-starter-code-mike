@@ -45,6 +45,16 @@ services:
         aliases:
           - jenkins
 
+  sonarqube:
+    build: ./sonarqube/
+    container_name: sonarqube_hive_mike
+    ports:
+      - "9000:9000"
+    networks:
+      hive-network:
+        aliases:
+          - sonarqube
+
 networks:
   hive-network:
 
