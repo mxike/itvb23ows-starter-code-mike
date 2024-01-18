@@ -29,9 +29,26 @@ services:
         aliases:
           - database
 
+  jenkins:
+    build: ./jenkins/
+    container_name: jenkins_hive_mike
+    ports:
+      - "8080:8080"
+    environment:
+      JENKINS_ADMIN_ID: root
+      JENKINS_ADMIN_PASSWORD: root
+      JENKIN_PORT: 8080
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      hive-network:
+        aliases:
+          - jenkins
+
 networks:
   hive-network:
 
 
 volumes:
   mysql-data:
+  jenkins-data:
