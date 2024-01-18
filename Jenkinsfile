@@ -19,7 +19,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'Hive-SonarQube-Scanner'
                     echo "Scanner Home: ${scannerHome}"
-                    sh(script: "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-project-mike", returnStatus: true)
+                    sh(script: "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-project")
                 }
                 echo 'Sonarqube working...'
             }
