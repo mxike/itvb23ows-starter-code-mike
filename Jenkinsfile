@@ -16,9 +16,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script { scannerHome = tool 'Hive-SonarQube-Scanner' }
-                withSonarQubeEnv('Hive-SonarQube-Server') {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-project-mike"
+                script {
+                    def scannerHome = tool 'Hive-SonarQube-Scanner'
+                    echo "Scanner Home: ${scannerHome}"
+                    sh(script: "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hive-project-mike", returnStatus: true)
                 }
                 echo 'Sonarqube working...'
             }
