@@ -17,12 +17,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def scannerHome = tool 'Hive-SonarQube-Scanner';
+                    def scannerHome = tool 'Hive-SonarQube-Server';
 
-                    withSonarQubeEnv('Hive-SonarQube-Server') {
+                    withSonarQubeEnv('Hive-SonarQube-Scanner') {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
+                echo 'Sonarqube test...'
             }
         }
 
