@@ -14,6 +14,18 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'Hive-SonarQube-Scanner';
+
+                    withSonarQubeEnv('Hive-SonarQube-Server') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
