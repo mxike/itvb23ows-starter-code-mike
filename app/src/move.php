@@ -14,7 +14,7 @@ unset($_SESSION['error']);
 
 if (!isset($board[$from]))
     $_SESSION['error'] = 'Board position is empty';
-elseif ($board[$from][count($board[$from])-1][0] != $player)
+elseif ($board[$from][count($board[$from]) - 1][0] != $player)
     $_SESSION['error'] = "Tile is not owned by player";
 elseif ($hand['Q'])
     $_SESSION['error'] = "Queen bee is not played";
@@ -55,7 +55,7 @@ else {
         if (isset($board[$to])) array_push($board[$to], $tile);
         else $board[$to] = [$tile];
         $_SESSION['player'] = 1 - $_SESSION['player'];
-        $db = include 'database.php';
+        $db = include '../../database/database.php';
         $stmt = $db->prepare('insert into moves (game_id, type, move_from, move_to, previous_id, state) values (?, "move", ?, ?, ?, ?)');
         $stmt->bind_param('issis', $_SESSION['game_id'], $from, $to, $_SESSION['last_move'], get_state());
         $stmt->execute();
@@ -65,5 +65,3 @@ else {
 }
 
 header('Location: index.php');
-
-?>
