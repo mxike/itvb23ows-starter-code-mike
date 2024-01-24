@@ -3,8 +3,13 @@
 session_start();
 
 include_once 'util.php';
+require_once 'main/DatabaseHandler.php';
 
-$from = $_POST['from'];
+use Main\DatabaseHandler;
+
+$db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+
+$fromPosition = $_POST['fromPosition'];
 $toPosition = $_POST['toPosition'];
 
 $player = $_SESSION['player'];
@@ -12,14 +17,14 @@ $board = $_SESSION['board'];
 $hand = $_SESSION['hand'][$player];
 unset($_SESSION['error']);
 
-if (!isset($board[$from]))
+if (!isset($board[$fromPosition]))
     $_SESSION['error'] = 'Board position is empty';
-elseif ($board[$from][count($board[$from]) - 1][0] != $player)
+elseif ($board[$fromPosition][count($board[$fromPosition]) - 1][0] != $player)
     $_SESSION['error'] = "Tile is not owned by player";
 elseif ($hand['Q'])
     $_SESSION['error'] = "Queen bee is not played";
 else {
-    $tile = array_pop($board[$from]);
+    $tile = array_pop($board[$fromPosition]);
     if (!hasNeighBour($toPosition, $board))
         $_SESSION['error'] = "Move would split hive";
     else {
@@ -40,26 +45,22 @@ else {
         if ($all) {
             $_SESSION['error'] = "Move would split hive";
         } else {
-            if ($from == $toPosition) $_SESSION['error'] = 'Tile must move';
+            if ($fromPosition == $toPosition) $_SESSION['error'] = 'Tile must move';
             elseif (isset($board[$toPosition]) && $tile[1] != "B") $_SESSION['error'] = 'Tile not empty';
             elseif ($tile[1] == "Q" || $tile[1] == "B") {
-                if (!slide($board, $from, $toPosition))
+                if (!slide($board, $fromPosition, $toPosition))
                     $_SESSION['error'] = 'Tile must slide';
             }
         }
     }
     if (isset($_SESSION['error'])) {
-        if (isset($board[$from])) array_push($board[$from], $tile);
-        else $board[$from] = [$tile];
+        if (isset($board[$fromPosition])) array_push($board[$fromPosition], $tile);
+        else $board[$fromPosition] = [$tile];
     } else {
         if (isset($board[$toPosition])) array_push($board[$toPosition], $tile);
         else $board[$toPosition] = [$tile];
         $_SESSION['player'] = 1 - $_SESSION['player'];
-        $db = include '../../database/database.php';
-        $stmt = $db->prepare('INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, "move", ?, ?, ?, ?)');
-        $stmt->bind_param('issis', $_SESSION['game_id'], $from, $toPosition, $_SESSION['last_move'], get_state());
-        $stmt->execute();
-        $_SESSION['last_move'] = $db->insert_id;
+        $_SESSION['last_move'] = $db->move($_SESSION['game_id'], $from, $to, $_SESSION['last_move']);
     }
     $_SESSION['board'] = $board;
 }

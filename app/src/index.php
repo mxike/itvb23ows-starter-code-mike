@@ -22,6 +22,7 @@ $toPosition = [];
 foreach ($GLOBALS['OFFSETS'] as $pq) {
     foreach (array_keys($board) as $pos) {
         $pq2 = explode(',', $pos);
+        echo ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
         $toPosition[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
     }
 }
@@ -109,7 +110,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
     </form>
 
     <form method="post" action="move.php">
-        <select name="from">
+        <select name="fromPosition">
             <?php
             foreach (array_keys($board) as $pos) {
                 echo "<option value=\"$pos\">$pos</option>";

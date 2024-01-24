@@ -29,7 +29,7 @@ elseif (array_sum($hand) <= 8 && $hand['Q']) {
     $_SESSION['board'][$toPosition] = [[$_SESSION['player'], $piece]];
     $_SESSION['hand'][$player][$piece]--;
     $_SESSION['player'] = 1 - $_SESSION['player'];
-    $_SESSION['last_move']  = $db->doAction($_SESSION['game_id'], "play", null, $toPosition, $_SESSION['last_move'], $db->getState());
+    $_SESSION['last_move']  = $db->play($_SESSION['game_id'], $piece, $toPosition, $_SESSION['last_move']);
 }
 
 header('Location: index.php');

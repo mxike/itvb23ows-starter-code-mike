@@ -18,17 +18,36 @@ class DatabaseHandler
         }
     }
 
-    public function doAction(
-        int $gameId,
-        string $action,
-        string | null $fromPosition,
-        string | null $toPosition,
-        int | null $prevId,
-        string $state
-    ) {
-        $cmd = "INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, ?, ?, ?, ?, ?);";
-        $stmt = $this->connection->prepare($cmd);
-        $stmt->bind_param("issiis", $gameId, $action, $fromPosition, $toPosition, $prevId, $state);
+    public function play($gameId, $piece, $moveTo, $previousId)
+    {
+        $stmt = $this->connection->prepare('INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, "play", ?, ?, ?, ?)');
+        $stmt->bind_param('issis', $gameId, $piece, $moveTo, $previousId, $this->getState());
+        $stmt->execute();
+
+        return $this->connection->insert_id;
+    }
+
+    public function pass($gameId, $previousId)
+    {
+        $stmt = $this->connection->prepare('INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, "pass", null, null, ?, ?)');
+        $stmt->bind_param('iis', $gameId, $previousId, $this->getState());
+        $stmt->execute();
+
+        return $this->connection->insert_id;
+    }
+
+    public function move($gameId, $piece, $moveTo, $previousId)
+    {
+        $stmt = $this->connection->prepare('INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, "move", ?, ?, ?, ?)');
+        $stmt->bind_param('issis', $gameId, $piece, $moveTo, $previousId, $this->getState());
+        $stmt->execute();
+
+        return $this->connection->insert_id;
+    }
+
+    public function restart()
+    {
+        $stmt = $this->connection->prepare('INSERT INTO games VALUES ()');
         $stmt->execute();
 
         return $this->connection->insert_id;
@@ -41,11 +60,9 @@ class DatabaseHandler
         return $stmt->get_result();
     }
 
-    public function restart()
+    public function undo()
     {
-        $this->connection->prepare('INSERT INTO games VALUES ()')->execute();
-        // $_SESSION['game_id'] = $this->connection->insert_id;
-        return $this->connection->insert_id;
+        // TODO
     }
 
     public function getState()
