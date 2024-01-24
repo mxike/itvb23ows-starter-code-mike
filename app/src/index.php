@@ -3,23 +3,31 @@ session_start();
 
 include_once 'util.php';
 
+require_once 'main/DatabaseHandler.php';
+
+use Main\DatabaseHandler;
+
+$db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+
 if (!isset($_SESSION['board'])) {
     header('Location: restart.php');
     exit(0);
 }
+
 $board = $_SESSION['board'];
 $player = $_SESSION['player'];
 $hand = $_SESSION['hand'];
 
-$to = [];
+$toPosition = [];
 foreach ($GLOBALS['OFFSETS'] as $pq) {
     foreach (array_keys($board) as $pos) {
         $pq2 = explode(',', $pos);
-        $to[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
+        $toPosition[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
     }
 }
-$to = array_unique($to);
-if (!count($to)) $to[] = '0,0';
+
+$toPosition = array_unique($toPosition);
+if (!count($toPosition)) $toPosition[] = '0,0';
 ?>
 <!DOCTYPE html>
 <html>
@@ -89,15 +97,17 @@ if (!count($to)) $to[] = '0,0';
             }
             ?>
         </select>
-        <select name="to">
+        <select name="toPosition">
             <?php
-            foreach ($to as $pos) {
+            foreach ($toPosition as $pos) {
                 echo "<option value=\"$pos\">$pos</option>";
             }
             ?>
         </select>
+        <input type="hidden" name="action" value="play">
         <input type="submit" value="Play">
     </form>
+
     <form method="post" action="move.php">
         <select name="from">
             <?php
@@ -106,37 +116,44 @@ if (!count($to)) $to[] = '0,0';
             }
             ?>
         </select>
-        <select name="to">
+        <select name="toPosition">
             <?php
-            foreach ($to as $pos) {
+            foreach ($toPosition as $pos) {
                 echo "<option value=\"$pos\">$pos</option>";
             }
             ?>
         </select>
+        <input type="hidden" name="action" value="move">
         <input type="submit" value="Move">
     </form>
+
     <form method="post" action="pass.php">
+        <input type="hidden" name="action" value="pass">
         <input type="submit" value="Pass">
     </form>
+
     <form method="post" action="restart.php">
+        <input type="hidden" name="action" value="restart">
         <input type="submit" value="Restart">
     </form>
+
     <strong><?php if (isset($_SESSION['error'])) echo ($_SESSION['error']);
             unset($_SESSION['error']); ?></strong>
+
     <ol>
         <?php
-        $db = include '../../database/database.php';
-        $stmt = $db->prepare('SELECT * FROM moves WHERE game_id = ' . $_SESSION['game_id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $db->getMoves($_SESSION['game_id']);
         while ($row = $result->fetch_array()) {
             echo '<li>' . $row[2] . ' ' . $row[3] . ' ' . $row[4] . '</li>';
         }
         ?>
     </ol>
+
     <form method="post" action="undo.php">
+        <input type="hidden" name="action" value="undo">
         <input type="submit" value="Undo">
     </form>
+
 </body>
 
 </html>

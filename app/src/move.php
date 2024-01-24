@@ -5,7 +5,7 @@ session_start();
 include_once 'util.php';
 
 $from = $_POST['from'];
-$to = $_POST['to'];
+$toPosition = $_POST['toPosition'];
 
 $player = $_SESSION['player'];
 $board = $_SESSION['board'];
@@ -20,7 +20,7 @@ elseif ($hand['Q'])
     $_SESSION['error'] = "Queen bee is not played";
 else {
     $tile = array_pop($board[$from]);
-    if (!hasNeighBour($to, $board))
+    if (!hasNeighBour($toPosition, $board))
         $_SESSION['error'] = "Move would split hive";
     else {
         $all = array_keys($board);
@@ -40,10 +40,10 @@ else {
         if ($all) {
             $_SESSION['error'] = "Move would split hive";
         } else {
-            if ($from == $to) $_SESSION['error'] = 'Tile must move';
-            elseif (isset($board[$to]) && $tile[1] != "B") $_SESSION['error'] = 'Tile not empty';
+            if ($from == $toPosition) $_SESSION['error'] = 'Tile must move';
+            elseif (isset($board[$toPosition]) && $tile[1] != "B") $_SESSION['error'] = 'Tile not empty';
             elseif ($tile[1] == "Q" || $tile[1] == "B") {
-                if (!slide($board, $from, $to))
+                if (!slide($board, $from, $toPosition))
                     $_SESSION['error'] = 'Tile must slide';
             }
         }
@@ -52,12 +52,12 @@ else {
         if (isset($board[$from])) array_push($board[$from], $tile);
         else $board[$from] = [$tile];
     } else {
-        if (isset($board[$to])) array_push($board[$to], $tile);
-        else $board[$to] = [$tile];
+        if (isset($board[$toPosition])) array_push($board[$toPosition], $tile);
+        else $board[$toPosition] = [$tile];
         $_SESSION['player'] = 1 - $_SESSION['player'];
         $db = include '../../database/database.php';
-        $stmt = $db->prepare('insert into moves (game_id, type, move_from, move_to, previous_id, state) values (?, "move", ?, ?, ?, ?)');
-        $stmt->bind_param('issis', $_SESSION['game_id'], $from, $to, $_SESSION['last_move'], get_state());
+        $stmt = $db->prepare('INSERT INTO moves (game_id, type, move_from, move_to, previous_id, state) VALUES (?, "move", ?, ?, ?, ?)');
+        $stmt->bind_param('issis', $_SESSION['game_id'], $from, $toPosition, $_SESSION['last_move'], get_state());
         $stmt->execute();
         $_SESSION['last_move'] = $db->insert_id;
     }
