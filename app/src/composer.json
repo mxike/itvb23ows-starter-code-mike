@@ -1,0 +1,15 @@
+{
+    "name": "mike2/src",
+    "autoload": {
+        "psr-4": {
+            "main\\": "./main/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mxike",
+            "email": "mike25092001@hotmail.com"
+        }
+    ],
+    "require": {}
+}

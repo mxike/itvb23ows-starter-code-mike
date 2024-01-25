@@ -1,6 +1,6 @@
 <?php
 
-namespace Main;
+namespace main;
 
 use Exception;
 use mysqli;

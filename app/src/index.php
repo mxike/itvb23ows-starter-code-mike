@@ -1,13 +1,15 @@
 <?php
 session_start();
 
-include_once 'util.php';
+use main\DatabaseHandler;
+use main\Game;
+use main\GameLogic;
 
-require_once 'main/DatabaseHandler.php';
-
-use Main\DatabaseHandler;
+require_once './vendor/autoload.php';
 
 $db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+$GameLogic = new GameLogic();
+$game = new Game($db, $GameLogic);
 
 if (!isset($_SESSION['board'])) {
     header('Location: restart.php');
@@ -22,10 +24,12 @@ $toPosition = [];
 foreach ($GLOBALS['OFFSETS'] as $pq) {
     foreach (array_keys($board) as $pos) {
         $pq2 = explode(',', $pos);
-        echo ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
+        // echo ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
         $toPosition[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
     }
 }
+
+$game->waitAction();
 
 $toPosition = array_unique($toPosition);
 if (!count($toPosition)) $toPosition[] = '0,0';
@@ -90,7 +94,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         Turn: <?php if ($player == 0) echo "White";
                 else echo "Black"; ?>
     </div>
-    <form method="post" action="play.php">
+    <form method="post">
         <select name="piece">
             <?php
             foreach ($hand[$player] as $tile => $ct) {
@@ -133,7 +137,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="submit" value="Pass">
     </form>
 
-    <form method="post" action="restart.php">
+    <form method="post">
         <input type="hidden" name="action" value="restart">
         <input type="submit" value="Restart">
     </form>
