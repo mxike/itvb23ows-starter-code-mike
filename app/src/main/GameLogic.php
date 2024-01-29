@@ -49,7 +49,7 @@ class GameLogic
             $q = $b[1] + $pq[1];
             if ($this->isNeighbour($fromPosition, $p . "," . $q)) $common[] = $p . "," . $q;
         }
-        if (!isset($board[$common[0]]) && !isset($board[$common[1]]) && !isset($board[$fromPosition]) && !isset($board[$toPosition])) return false; // BUG 2
+        if (!isset($board[$common[0]]) && !isset($board[$common[1]]) && !isset($board[$fromPosition]) && !isset($board[$toPosition])) return false; //BUG 2
         return min($this->len($board[$common[0]]), $this->len($board[$common[1]])) <= max($this->len($board[$fromPosition]), $this->len($board[$toPosition]));
     }
 }

@@ -115,15 +115,7 @@ class Game
         elseif (array_sum($hand) < 11 && !$this->gameLogic->neighboursAreSameColor($player, $toPosition, $board))
             $this->error = "Board position has opposing neighbour";
         elseif (array_sum($hand) <= 8 && $hand['Q']) {
-            // BUG #3 | ISSUE #9 must play queen
-            if ($hand[$piece] !== $hand['Q']) {
-                $this->error = 'Must play queen bee';
-            } else {
-                $this->setBoard($toPosition, $piece);
-                $this->hand[$player][$piece]--;
-                $this->player = 1 - $this->player;
-                $this->lastMove = $this->database->play($this->gameId, $piece, $toPosition, $this->lastMove);
-            }
+            $this->error = 'Must play queen bee';
         } else {
             $this->setBoard($toPosition, $piece);
             $this->hand[$player][$piece]--;
@@ -205,7 +197,7 @@ class Game
                 else $board[$toPosition] = [$tile];
                 $this->player = 1 - $this->player;
                 $this->lastMove = $this->database->move($this->gameId, $fromPosition, $toPosition, $this->lastMove);
-                unset($board[$fromPosition]); //BUG 4.
+                unset($board[$fromPosition]); // BUG 4.
             }
             $this->board = $board;
         }

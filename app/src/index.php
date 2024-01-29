@@ -134,7 +134,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         </select>
         <select name="toPosition">
             <?php
-            // You dont need to do this one, says so in BUG 1.
+            // You dont need to do this one, read BUG 1.
             foreach ($toPosition as $pos) {
                 echo "<option value=\"$pos\">$pos</option>";
             }
