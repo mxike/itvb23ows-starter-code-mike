@@ -10,15 +10,16 @@ require_once './vendor/autoload.php';
 $db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
 $GameLogic = new GameLogic();
 $game = new Game($db, $GameLogic);
+$game->waitAction();
 
 if (!isset($_SESSION['board'])) {
     header('Location: restart.php');
     exit(0);
 }
 
-$board = $_SESSION['board'];
-$player = $_SESSION['player'];
-$hand = $_SESSION['hand'];
+$board = $game->getBoard();
+$player = $game->getPlayer();
+// $hand = $_SESSION['hand'];
 
 $toPosition = [];
 foreach ($GLOBALS['OFFSETS'] as $pq) {
@@ -29,7 +30,6 @@ foreach ($GLOBALS['OFFSETS'] as $pq) {
     }
 }
 
-$game->waitAction();
 
 $toPosition = array_unique($toPosition);
 if (!count($toPosition)) $toPosition[] = '0,0';
@@ -73,7 +73,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
     <div class="hand">
         White:
         <?php
-        foreach ($hand[0] as $tile => $ct) {
+        foreach ($game->getPlayerHand(0) as $tile => $ct) {
             for ($i = 0; $i < $ct; $i++) {
                 echo '<div class="tile player0"><span>' . $tile . "</span></div> ";
             }
@@ -83,7 +83,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
     <div class="hand">
         Black:
         <?php
-        foreach ($hand[1] as $tile => $ct) {
+        foreach ($game->getPlayerHand(1) as $tile => $ct) {
             for ($i = 0; $i < $ct; $i++) {
                 echo '<div class="tile player1"><span>' . $tile . "</span></div> ";
             }
@@ -97,7 +97,10 @@ if (!count($toPosition)) $toPosition[] = '0,0';
     <form method="post">
         <select name="piece">
             <?php
-            foreach ($hand[$player] as $tile => $ct) {
+            foreach ($game->getPlayerHand($player) as $tile => $ct) {
+                // if ($ct > 0) {
+                //     echo "<option value=\"$tile\">$tile</option>";
+                // }
                 echo "<option value=\"$tile\">$tile</option>";
             }
             ?>
@@ -113,7 +116,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="submit" value="Play">
     </form>
 
-    <form method="post" action="move.php">
+    <form method="post">
         <select name="fromPosition">
             <?php
             foreach (array_keys($board) as $pos) {
@@ -142,8 +145,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="submit" value="Restart">
     </form>
 
-    <strong><?php if (isset($_SESSION['error'])) echo ($_SESSION['error']);
-            unset($_SESSION['error']); ?></strong>
+    <strong><?php if (isset($_SESSION['error'])) echo ($_SESSION['error']); ?></strong>
 
     <ol>
         <?php
