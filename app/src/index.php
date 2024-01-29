@@ -98,17 +98,20 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <select name="piece">
             <?php
             foreach ($game->getPlayerHand($player) as $tile => $ct) {
-                // if ($ct > 0) {
-                //     echo "<option value=\"$tile\">$tile</option>";
-                // }
-                echo "<option value=\"$tile\">$tile</option>";
+                // BUG 1 load available pieces only
+                if ($ct > 0) {
+                    echo "<option value=\"$tile\">$tile</option>";
+                }
             }
             ?>
         </select>
         <select name="toPosition">
             <?php
             foreach ($toPosition as $pos) {
-                echo "<option value=\"$pos\">$pos</option>";
+                // BUG 1 load available position places
+                if (!isset($board[$pos])) {
+                    echo "<option value=\"$pos\">$pos</option>";
+                }
             }
             ?>
         </select>
@@ -119,13 +122,19 @@ if (!count($toPosition)) $toPosition[] = '0,0';
     <form method="post">
         <select name="fromPosition">
             <?php
+            // echo '<pre>';
+            // print_r($board);
+            // echo '</pre>';
+            // BUG 1 load positions
             foreach (array_keys($board) as $pos) {
-                echo "<option value=\"$pos\">$pos</option>";
+                if ($board[$pos][0][0] == $player)
+                    echo "<option value=\"$pos\">$pos</option>";
             }
             ?>
         </select>
         <select name="toPosition">
             <?php
+            // You dont need to do this one, says so in BUG 1.
             foreach ($toPosition as $pos) {
                 echo "<option value=\"$pos\">$pos</option>";
             }

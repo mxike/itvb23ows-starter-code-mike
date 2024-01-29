@@ -34,7 +34,7 @@ class Game
         $this->error = $_SESSION['error'] ?? null;
     }
 
-    private function updatingSession()
+    public function updatingSession()
     {
         $_SESSION["game_id"] = $this->gameId;
         $_SESSION["player"] = $this->player;
@@ -62,7 +62,9 @@ class Game
                     $this->pass();
                     break;
                 case 'move':
-                    $this->move();
+                    $fromPosition = $_POST['fromPosition'];
+                    $toPosition = $_POST['toPosition'];
+                    $this->move($fromPosition, $toPosition);
                     break;
                 case 'undo':
                     $this->undo();
@@ -98,7 +100,6 @@ class Game
         return $this->hand[$index];
     }
 
-
     public function play($piece, $toPosition)
     {
         $player = $this->player;
@@ -109,12 +110,20 @@ class Game
             $this->error = "Player does not have tile";
         elseif (isset($board[$toPosition]))
             $this->error = 'Board position is not empty';
-        elseif (count($this->board) && !$this->gameLogic->hasNeighBour($toPosition, $this->board))
+        elseif (count($board) && !$this->gameLogic->hasNeighBour($toPosition, $board))
             $this->error = "board position has no neighbour";
-        elseif (array_sum($hand) < 11 && !$this->gameLogic->neighboursAreSameColor($this->player, $toPosition, $this->board))
+        elseif (array_sum($hand) < 11 && !$this->gameLogic->neighboursAreSameColor($player, $toPosition, $board))
             $this->error = "Board position has opposing neighbour";
         elseif (array_sum($hand) <= 8 && $hand['Q']) {
-            $this->error = 'Must play queen bee';
+            // BUG #3 | ISSUE #9 must play queen
+            if ($hand[$piece] !== $hand['Q']) {
+                $this->error = 'Must play queen bee';
+            } else {
+                $this->setBoard($toPosition, $piece);
+                $this->hand[$player][$piece]--;
+                $this->player = 1 - $this->player;
+                $this->lastMove = $this->database->play($this->gameId, $piece, $toPosition, $this->lastMove);
+            }
         } else {
             $this->setBoard($toPosition, $piece);
             $this->hand[$player][$piece]--;
@@ -146,10 +155,10 @@ class Game
 
     public function move($fromPosition, $toPosition)
     {
-
         $player = $this->player;
         $board = $this->board;
         $hand = $this->hand[$player];
+        unset($_SESSION['error']);
 
         if (!isset($board[$fromPosition]))
             $this->error = 'Board position is empty';
@@ -179,7 +188,7 @@ class Game
                 if ($all) {
                     $this->error = "Move would split hive";
                 } else {
-                    if ($fromPosition == $toPosition) $this->error = 'Tile must move';
+                    if ($fromPosition == $toPosition) $_SESSION['error'] = 'Tile must move';
                     elseif (isset($board[$toPosition]) && $tile[1] != "B") $this->error = 'Tile not empty';
                     elseif ($tile[1] == "Q" || $tile[1] == "B") {
                         if (!$this->gameLogic->slide($board, $fromPosition, $toPosition))
@@ -188,15 +197,17 @@ class Game
                 }
             }
             if (isset($_SESSION['error'])) {
-                if (isset($board[$fromPosition])) array_push($board[$fromPosition], $tile);
-                else $board[$fromPosition] = [$tile];
+                if (isset($board[$fromPosition])) {
+                    array_push($board[$fromPosition], $tile);
+                } else $board[$fromPosition] = [$tile];
             } else {
                 if (isset($board[$toPosition])) array_push($board[$toPosition], $tile);
                 else $board[$toPosition] = [$tile];
-                $player = 1 - $player;
+                $this->player = 1 - $this->player;
                 $this->lastMove = $this->database->move($this->gameId, $fromPosition, $toPosition, $this->lastMove);
+                unset($board[$fromPosition]); //BUG 4.
             }
-            $_SESSION['board'] = $board;
+            $this->board = $board;
         }
     }
 }
