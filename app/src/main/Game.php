@@ -34,7 +34,7 @@ class Game
         $this->error = $_SESSION['error'] ?? null;
     }
 
-    private function updatingSession()
+    public function updatingSession()
     {
         $_SESSION["game_id"] = $this->gameId;
         $_SESSION["player"] = $this->player;
@@ -114,7 +114,15 @@ class Game
         elseif (array_sum($hand) < 11 && !$this->gameLogic->neighboursAreSameColor($this->player, $toPosition, $this->board))
             $this->error = "Board position has opposing neighbour";
         elseif (array_sum($hand) <= 8 && $hand['Q']) {
-            $this->error = 'Must play queen bee';
+            // BUG #3 must play queen
+            if ($hand[$piece] !== $hand['Q']) {
+                $this->error = 'Must play queen bee';
+            } else {
+                $this->setBoard($toPosition, $piece);
+                $this->hand[$player][$piece]--;
+                $this->player = 1 - $this->player;
+                $this->lastMove = $this->database->play($this->gameId, $piece, $toPosition, $this->lastMove);
+            }
         } else {
             $this->setBoard($toPosition, $piece);
             $this->hand[$player][$piece]--;
