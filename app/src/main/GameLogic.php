@@ -96,7 +96,7 @@ class GameLogic
             return false;
         }
 
-        if (!isset($board[$toPosition])) {
+        if (isset($board[$toPosition])) {
             return false;
         }
 
