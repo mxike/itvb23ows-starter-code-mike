@@ -15,7 +15,7 @@ class Game
     private $lastMove;
     private $error;
 
-    public function __construct(DatabaseHandler $database, GameLogic $gameLogic)
+    public function __construct($database, GameLogic $gameLogic)
     {
         $this->gameLogic = $gameLogic;
         $this->database = $database;
@@ -23,7 +23,7 @@ class Game
         $this->initializeSession();
     }
 
-    private function initializeSession()
+    public function initializeSession()
     {
         $this->gameId = $_SESSION['game_id'];
         $this->hand = $_SESSION['hand'];
@@ -85,6 +85,21 @@ class Game
         $this->board[$to] = [[$this->player, $piece]];
     }
 
+    public function setPlayer($player)
+    {
+        $this->player = $player;
+    }
+
+    public function setPlayerHand($index, $hand)
+    {
+        $this->hand[$index] = $hand;
+    }
+
+    public function getError()
+    {
+        return $this->error;
+    }
+
     public function getBoard()
     {
         return $this->board;
@@ -115,7 +130,14 @@ class Game
         elseif (array_sum($hand) < 11 && !$this->gameLogic->neighboursAreSameColor($player, $toPosition, $board))
             $this->error = "Board position has opposing neighbour";
         elseif (array_sum($hand) <= 8 && $hand['Q']) {
-            $this->error = 'Must play queen bee';
+            if ($piece != 'Q') {
+                $this->error = 'Must play queen bee';
+            } else {
+                $this->setBoard($toPosition, $piece);
+                $this->hand[$player][$piece]--;
+                $this->player = 1 - $this->player;
+                $this->lastMove = $this->database->play($this->gameId, $piece, $toPosition, $this->lastMove);
+            }
         } else {
             $this->setBoard($toPosition, $piece);
             $this->hand[$player][$piece]--;

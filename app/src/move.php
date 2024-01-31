@@ -4,10 +4,13 @@ session_start();
 
 include_once 'util.php';
 require_once 'main/DatabaseHandler.php';
+require_once 'main/GameLogic.php';
 
 use Main\DatabaseHandler;
+use main\GameLogic;
 
 $db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+$gameLogic = new GameLogic();
 
 $fromPosition = $_POST['fromPosition'];
 $toPosition = $_POST['toPosition'];
@@ -25,7 +28,7 @@ elseif ($hand['Q'])
     $_SESSION['error'] = "Queen bee is not played";
 else {
     $tile = array_pop($board[$fromPosition]);
-    if (!hasNeighBour($toPosition, $board))
+    if (!$gameLogic->hasNeighBour($toPosition, $board))
         $_SESSION['error'] = "Move would split hive";
     else {
         $all = array_keys($board);
@@ -48,7 +51,7 @@ else {
             if ($fromPosition == $toPosition) $_SESSION['error'] = 'Tile must move';
             elseif (isset($board[$toPosition]) && $tile[1] != "B") $_SESSION['error'] = 'Tile not empty';
             elseif ($tile[1] == "Q" || $tile[1] == "B") {
-                if (!slide($board, $fromPosition, $toPosition))
+                if (!$gameLogic->slide($board, $fromPosition, $toPosition))
                     $_SESSION['error'] = 'Tile must slide';
             }
         }
