@@ -17,7 +17,7 @@ class UnitTestsGameUtils extends TestCase
         $this->game = new Game(self::createStub(DatabaseHandler::class), new GameLogic());
     }
 
-    public function test_Grasshopper_Can_Move()
+    public function test_Grasshopper_Can_Move_Over_Atleast_One_Tile()
     {
         // Initialize
         $this->game->setBoard("0,0", "Q");
@@ -28,13 +28,13 @@ class UnitTestsGameUtils extends TestCase
         $this->game->setPlayer(0); // set player to white
 
         // Action
-        $this->game->move("-1,0", "3,0");
+        $this->game->move("-1,0", "3,0"); // jump over 2 tiles.
 
         // Assert
         self::assertEquals('', $this->game->getError());
     }
 
-    public function test_Grasshopper_Can_Not_Move()
+    public function test_Grasshopper_Can_Not_Move_Without_Hopping_Over_Atleast_One_Tile()
     {
         // Initialize
         $this->game->setBoard("0,0", "Q");
@@ -69,5 +69,56 @@ class UnitTestsGameUtils extends TestCase
 
         // Assert
         self::assertEquals('Grasshopper cannot move to this position', $this->game->getError());
+    }
+
+    public function test_Ant_Can_Not_Move_To_Itself()
+    {
+        // Initialize
+        $this->game->setBoard("0,0", "Q");
+        $this->game->setBoard("0,-1", "A");
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard("0,1", "Q");
+        $this->game->setBoard("0,2", "B");
+        $this->game->setPlayer(0); // set player to white
+
+        // Action
+        $this->game->move("0,-1", "0,-1");
+
+        // Assert
+        self::assertEquals('Ant cannot move to this position', $this->game->getError()); // if ant tries to go to a place without neighbours it would split the hiv
+    }
+
+    public function test_Ant_Can_Not_Move_To_Tile_Without_Neighbours()
+    {
+        // Initialize
+        $this->game->setBoard("0,0", "Q");
+        $this->game->setBoard("0,-1", "A");
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard("0,1", "Q");
+        $this->game->setBoard("0,2", "B");
+        $this->game->setPlayer(0); // set player to white
+
+        // Action
+        $this->game->move("0,-1", "-2,5");
+
+        // Assert
+        self::assertEquals('Move would split hive', $this->game->getError()); // if ant tries to go to a place without neighbours it would split the hive.
+    }
+
+    public function test_Ant_Can_Move_To_Tile_With_Neighbours()
+    {
+        // Initialize
+        $this->game->setBoard("0,0", "Q");
+        $this->game->setBoard("0,-1", "A");
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard("0,1", "Q");
+        $this->game->setBoard("0,2", "B");
+        $this->game->setPlayer(0); // set player to white
+
+        // Action
+        $this->game->move("0,-1", "-1,2");
+
+        // Assert
+        self::assertEquals('', $this->game->getError());
     }
 }
