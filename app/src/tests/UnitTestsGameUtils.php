@@ -53,6 +53,7 @@ class UnitTestsGameUtils extends TestCase
         // Assert
         self::assertEquals('Grasshopper cannot move to this position', $this->game->getError());
     }
+<<<<<<< HEAD
 
     public function test_Grasshopper_Can_Not_Jump_To_Current_Position()
     {
@@ -70,4 +71,6 @@ class UnitTestsGameUtils extends TestCase
         // Assert
         self::assertEquals('Grasshopper cannot move to this position', $this->game->getError());
     }
+=======
+>>>>>>> aa2166d4908b497729766293ce65cba3037bb991
 }
