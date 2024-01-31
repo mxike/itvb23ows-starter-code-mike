@@ -208,6 +208,10 @@ class Game
                     case 'S':
                         break;
                     case 'A':
+                        if (!$this->gameLogic->canAntMove($board, $fromPosition, $toPosition)) {
+                            $this->error = "Ant cannot move to this position";
+                            return;
+                        }
                         break;
                     case 'G':
                         if (!$this->gameLogic->canGrassHopperMove($board, $fromPosition, $toPosition)) {

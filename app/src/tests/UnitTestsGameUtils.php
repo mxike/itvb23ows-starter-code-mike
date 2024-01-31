@@ -119,6 +119,6 @@ class UnitTestsGameUtils extends TestCase
         $this->game->move("0,-1", "-1,2");
 
         // Assert
-        self::assertEquals('', $this->game->getError());
+        self::assertNull($this->game->getError());
     }
 }

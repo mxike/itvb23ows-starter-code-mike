@@ -89,4 +89,21 @@ class GameLogic
 
         return true;
     }
+
+    public function canAntMove($board, $fromPosition, $toPosition)
+    {
+        if ($toPosition === $fromPosition) {
+            return false;
+        }
+
+        if (!isset($board[$toPosition])) {
+            return false;
+        }
+
+        if (!$this->hasNeighBour($toPosition, $board)) {
+            return false;
+        }
+
+        return true;
+    }
 }
