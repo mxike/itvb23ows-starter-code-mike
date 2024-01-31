@@ -17,164 +17,171 @@ class UnitTestsGame extends TestCase
         $this->game = new Game(self::createStub(DatabaseHandler::class), new GameLogic());
     }
 
+    // Test case to check if a piece not in player hand cannot be played
     public function test_Piece_Not_In_Player_Hand()
     {
-        /* BUG 1: De dropdown die aangeeft welke stenen een speler kan plaatsen bevat ook stenen die
+        /*  BUG 1: De dropdown die aangeeft welke stenen een speler kan plaatsen bevat ook stenen die
             de speler niet meer heeft. Bovendien bevat de dropdown die aangeeO waar een speler
             stenen kan plaatsen ook velden waar dat niet mogelijk is, en bevat de dropdown die
             aangeeft vanaf welke positiee een speler een steen wil verplaatsen ook velden die
             stenen van de tegenstander bevatten. */
 
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
         $this->game->setPlayer(1); // set player to black
-        $this->game->setBoard('1,0', 'Q'); // play black Q
-
-        $this->game->setPlayer(0);
-        $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
-
-        $this->game->play('Q', '0,1'); // play white Q again.
-
-        self::assertEquals('Player does not have tile', $this->game->getError());
-    }
-
-    public function test_Move_Queen_To_Legal_Place_At_The_Start()
-    {
-        // BUG 2: Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
-        // moeten zijn dat wit zijn koningin verplaatst naar (0, 1), maar dat wordt niet toegestaan.
-
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-        $this->game->setPlayer(1); // set player to black
-        $this->game->setBoard('1,0', 'Q'); // play black Q
-
+        $this->game->setBoard('1,0', 'Q');
         $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        // Perform a move
+        // Action
+        $this->game->play('Q', '0,1');
+
+        // Assert
+        self::assertEquals('Player does not have tile', $this->game->getError());
+    }
+
+    // Test case to check if a Queen can move to a legal place at the start
+    public function test_Move_Queen_To_Legal_Place_At_The_Start()
+    {
+        /*  BUG 2: Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
+            moeten zijn dat wit zijn koningin verplaatst naar (0, 1), maar dat wordt niet toegestaan. */
+
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('1,0', 'Q');
+        $this->game->setPlayer(0); // set player to white
+        $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
+
+        // Action
         $this->game->move('0,0', '0,1');
 
-        // Assert that the 'from' position is empty
+        // Assert
         self::assertEquals('', $this->game->getError());
     }
 
+    // Test case to check if Queen must play after three pieces played
     public function test_Queen_Must_Play_After_Three_Pieces_Played()
     {
-        // BUG 3: Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
-        // moeten zijn dat wit zijn koningin verplaatst naar (0, 1), maar dat wordt niet toegestaan.
+        /*  BUG 3: Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
+            moeten zijn dat wit zijn koningin verplaatst naar (0, 1), maar dat wordt niet toegestaan. */
 
-        # White moves
+        // Initialize white setup
         $this->game->setBoard('0,0', 'A');
         $this->game->setBoard('0,1', 'B');
         $this->game->setBoard('0,2', 'A');
-
         $this->game->setPlayer(0);
         $this->game->setPlayerHand(0, ['Q' => 1, 'B' => 1, 'S' => 2, 'A' => 1, 'G' => 3]);
 
-        # White illegal play
+        // Action 4th white
         $this->game->play('B', '0,3');
 
+        // Assert
         self::assertEquals('Must play queen bee', $this->game->getError());
     }
 
+    // Test case to check if a piece can be moved and the previous position becomes empty
     public function test_Move_From_Position_And_Check_If_Position_Is_Cleared()
     {
-        // BUG 4: Als je een steen verplaatst, kan je daarna geen nieuwe steen spelen op het oude veld,
-        // ook als dat volgens de regels wel zou mogen.
+        /*  BUG 4: Als je een steen verplaatst, kan je daarna geen nieuwe steen spelen op het oude veld,
+            ook als dat volgens de regels wel zou mogen. */
 
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
         $this->game->setPlayer(1); // set player to black 
-        $this->game->setBoard('1,0', 'Q'); // play black Q
-
-        // set player back to white
-        $this->game->setPlayer(0);
+        $this->game->setBoard('1,0', 'Q');
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        // Perform a move
+        // Action
         $this->game->move('0,0', '0,1');
 
-        // Assert that the 'from' position is empty
+        // Assert
         self::assertEmpty($this->game->getBoard()['0,0']);
     }
 
+    // Test case to check if playing a piece on a non-empty board position is disallowed
     public function test_Play_Piece_Board_Position_Is_Not_Empty()
     {
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
-        $this->game->setPlayer(1); // set player to Black
-        $this->game->setBoard('1,0', 'Q'); // play black Q
-
-        $this->game->setPlayer(0);
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('1,0', 'Q');
+        $this->game->setPlayer(0); // play white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        $this->game->play('B', '1,0'); // play white Q again.
+        // Action
+        $this->game->play('B', '1,0');
 
+        // Assert
         self::assertEquals('Board position is not empty', $this->game->getError());
     }
 
+    // Test case to check if playing a piece on a board position with an opposing neighbor is disallowed
     public function test_Play_Board_Position_Has_No_Neighbour()
     {
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
-        $this->game->setPlayer(1); // play black Q
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
         $this->game->setBoard('0,1', 'Q');
-
-        $this->game->setPlayer(0);
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        $this->game->play('B', '1,1'); // play white Q again.
+        // Action
+        $this->game->play('B', '1,1'); // play white B again.
 
+        // Assert
         self::assertEquals('Board position has opposing neighbour', $this->game->getError());
     }
 
+    // Test case to check if moving a piece to a non-empty tile is disallowed
     public function test_Move_Piece_Tile_Not_Empty()
     {
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
-        $this->game->setPlayer(1); // play black Q
-        $this->game->setBoard('0,1', 'Q'); // play black Q
-
-        $this->game->setPlayer(0); // set white Q again.
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        // Perform a move
+        // Action
         $this->game->move('0,0', '0,1');
 
-        // Assert that the 'from' position is empty
+        // Assert
         self::assertEquals('Tile not empty', $this->game->getError());
     }
 
+    // Test case to check if moving a piece requires sliding instead of jumping
     public function test_Move_Tile_Must_Slide()
     {
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
-        $this->game->setPlayer(1); // play black Q
-        $this->game->setBoard('0,1', 'Q'); // play black Q
-
-        $this->game->setPlayer(0); // set white Q again.
+        // Initialize
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        // Perform a move
+        // Action
         $this->game->move('0,0', '0,2');
 
-        // Assert that the 'from' position is empty
+        // Assert
         self::assertEquals('Tile must slide', $this->game->getError());
     }
 
+    // Test case to check if moving a piece would split the hive
     public function test_Move_Would_Split_Hive()
     {
-        $this->game->setBoard('0,0', 'Q'); // play white Q
-
-        $this->game->setPlayer(1); // play black Q
-        $this->game->setBoard('0,1', 'Q'); // play black Q
-
-        $this->game->setPlayer(0); // set white Q again.
+        // Initialize 
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
-        // Perform a move
+        // Action
         $this->game->move('0,0', '0,4');
 
-        // Assert that the 'from' position is empty
+        // Assert
         self::assertEquals('Move would split hive', $this->game->getError());
     }
 }
