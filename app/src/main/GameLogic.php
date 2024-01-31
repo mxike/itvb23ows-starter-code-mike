@@ -106,4 +106,35 @@ class GameLogic
 
         return true;
     }
+
+    public function canSpiderMove($board, $fromPosition, $toPosition)
+    {
+        if ($toPosition === $fromPosition) {
+            return false;
+        }
+
+        if (isset($board[$toPosition])) {
+            return false;
+        }
+
+        if (!$this->hasNeighBour($toPosition, $board)) {
+            return false;
+        }
+
+        $fromExplode = explode(',', $fromPosition);
+        $toExplode = explode(',', $toPosition);
+
+        // Calculate the absolute differences in x and y coordinates
+        $firstValueDifference = abs($toExplode[0] - $fromExplode[0]);
+        $secondValueDifference = abs($toExplode[1] - $fromExplode[1]);
+
+        // Check if the total distance is exactly 3 steps
+        $totalDistance = $firstValueDifference + $secondValueDifference;
+
+        if ($totalDistance != 3) {
+            return false;
+        }
+
+        return true;
+    }
 }

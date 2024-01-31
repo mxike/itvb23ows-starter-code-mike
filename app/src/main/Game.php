@@ -206,6 +206,10 @@ class Game
                     case 'B':
                         break;
                     case 'S':
+                        if (!$this->gameLogic->canSpiderMove($board, $fromPosition, $toPosition)) {
+                            $this->error = "Spider cannot move to this position";
+                            return;
+                        }
                         break;
                     case 'A':
                         if (!$this->gameLogic->canAntMove($board, $fromPosition, $toPosition)) {
