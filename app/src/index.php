@@ -144,7 +144,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="submit" value="Move">
     </form>
 
-    <form method="post" action="pass.php">
+    <form method="post">
         <input type="hidden" name="action" value="pass">
         <input type="submit" value="Pass">
     </form>

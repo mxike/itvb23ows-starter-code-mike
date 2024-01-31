@@ -148,8 +148,8 @@ class Game
 
     public function pass()
     {
-        $_SESSION['last_move'] =  $this->database->pass($_SESSION['game_id'], $_SESSION['last_move']);
-        $_SESSION['player'] = 1 - $_SESSION['player'];
+        $this->lastMove =  $this->database->pass($this->gameId, $this->lastMove);
+        $this->player = 1 - $this->player;
     }
 
     public function restart()
@@ -199,6 +199,24 @@ class Game
                         }
                     }
                 }
+
+                switch ($tile[1]) {
+                    case 'Q':
+                        break;
+                    case 'B':
+                        break;
+                    case 'S':
+                        break;
+                    case 'A':
+                        break;
+                    case 'G':
+                        if (!$this->gameLogic->canGrassHopperMove($board, $fromPosition, $toPosition)) {
+                            $this->error = "Grasshopper cannot move to this position";
+                            return;
+                        }
+                        break;
+                }
+
                 if ($all) {
                     $this->error = "Move would split hive";
                 } else {

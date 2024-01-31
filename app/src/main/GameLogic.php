@@ -52,4 +52,41 @@ class GameLogic
         if (!isset($board[$common[0]]) && !isset($board[$common[1]]) && !isset($board[$fromPosition]) && !isset($board[$toPosition])) return false; //BUG 2
         return min($this->len($board[$common[0]]), $this->len($board[$common[1]])) <= max($this->len($board[$fromPosition]), $this->len($board[$toPosition]));
     }
+
+    public function canGrassHopperMove($board, $fromPosition, $toPosition)
+    {
+        // Cannot move to itself
+        if ($fromPosition === $toPosition) {
+            return false;
+        }
+
+        // Split coordinates
+        $fromExplode = explode(',', $fromPosition);
+        $toExplode = explode(',', $toPosition);
+
+        // Calculate offset
+        $offset = [$toExplode[0] - $fromExplode[0], $toExplode[1] - $fromExplode[1]];
+
+        // Check offset (vertical, horizontal, or diagonal)
+        if (!(($offset[0] == 0 && $offset[1] != 0) || ($offset[1] == 0 && $offset[0] != 0) || ($offset[0] == $offset[1]))) {
+            return false;
+        }
+
+        $p = $fromExplode[0] + $offset[0];
+        $q = $fromExplode[1] + $offset[1];
+
+        while ($p != $toExplode[0] || $q != $toExplode[1]) {
+            $pos = $p . "," . $q;
+
+            if (isset($board[$pos])) {
+                return false;
+            }
+
+            // move to the next tile
+            $p += $offset[0];
+            $q += $offset[1];
+        }
+
+        return true;
+    }
 }
