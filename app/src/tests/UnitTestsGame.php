@@ -40,12 +40,14 @@ class UnitTestsGame extends TestCase
 
     public function test_Move_Queen_To_Legal_Place_At_The_Start()
     {
-        // BUG 2 -> Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
+        // BUG 2: Als wit een bijenkoningin speelt op (0, 0), en zwart op (1, 0), dan zou het een legale zet
         // moeten zijn dat wit zijn koningin verplaatst naar (0, 1), maar dat wordt niet toegestaan.
 
         $this->game->setBoard('0,0', 'Q'); // play white Q
+        $this->game->setPlayer(1); // set player to black
         $this->game->setBoard('1,0', 'Q'); // play black Q
-        $this->game->setPlayer(0);
+
+        $this->game->setPlayer(0); // set player to white
         $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
 
         // Perform a move
