@@ -17,7 +17,7 @@ class UnitTestsGameUtils extends TestCase
         $this->game = new Game(self::createStub(DatabaseHandler::class), new GameLogic());
     }
 
-    public function test_Grasshopper_Can_Move()
+    public function test_Grasshopper_Can_Move_Over_Atleast_One_Tile()
     {
         // Initialize
         $this->game->setBoard("0,0", "Q");
@@ -28,13 +28,13 @@ class UnitTestsGameUtils extends TestCase
         $this->game->setPlayer(0); // set player to white
 
         // Action
-        $this->game->move("-1,0", "3,0");
+        $this->game->move("-1,0", "3,0"); // jump over 2 tiles.
 
         // Assert
         self::assertEquals('', $this->game->getError());
     }
 
-    public function test_Grasshopper_Can_Not_Move()
+    public function test_Grasshopper_Can_Not_Move_Without_Hopping_Over_Atleast_One_Tile()
     {
         // Initialize
         $this->game->setBoard("0,0", "Q");
@@ -53,7 +53,6 @@ class UnitTestsGameUtils extends TestCase
         // Assert
         self::assertEquals('Grasshopper cannot move to this position', $this->game->getError());
     }
-<<<<<<< HEAD
 
     public function test_Grasshopper_Can_Not_Jump_To_Current_Position()
     {
@@ -71,6 +70,4 @@ class UnitTestsGameUtils extends TestCase
         // Assert
         self::assertEquals('Grasshopper cannot move to this position', $this->game->getError());
     }
-=======
->>>>>>> aa2166d4908b497729766293ce65cba3037bb991
 }
