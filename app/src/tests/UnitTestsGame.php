@@ -234,4 +234,66 @@ class UnitTestsGame extends TestCase
         // Assert
         self::assertEquals("You cannot pass", $this->game->getError());
     }
+
+    public function test_Player_White_Has_Won_The_Game()
+    {
+        // Initialize
+        $this->game->setPlayer(1);
+        $this->game->setBoard('0,2', 'B');
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setBoard('0,0', 'B');
+        $this->game->setBoard('1,1', 'S');
+        $this->game->setBoard('-1,1', 'A');
+        $this->game->setBoard('-1,2', 'A');
+
+        // Action
+        $this->game->setPlayer(0);
+        $this->game->setBoard('1,0', 'S');
+
+        // Assert
+        self::assertTrue($this->game->hasWon($this->game->getBoard()));
+    }
+
+    public function test_Player_Black_Has_Won_The_Game()
+    {
+        // Initialize
+        $this->game->setPlayer(0);
+        $this->game->setBoard('0,2', 'B');
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setBoard('0,0', 'B');
+        $this->game->setBoard('1,1', 'S');
+        $this->game->setBoard('-1,1', 'A');
+        $this->game->setBoard('-1,2', 'A');
+
+        // Action
+        $this->game->setPlayer(1);
+        $this->game->setBoard('1,0', 'S');
+
+        // Assert
+        self::assertTrue($this->game->hasWon($this->game->getBoard()));
+    }
+
+    public function test_Draw_Game()
+    {
+        // Initialize
+        $this->game->setPlayer(0);
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setBoard('-1,0', 'B');
+        $this->game->setBoard('1,-1', 'A');
+        $this->game->setBoard('0,-1', 'B');
+        $this->game->setBoard('-1,1', 'A');
+
+        $this->game->setPlayer(1);
+        $this->game->setBoard('0,1', 'Q');
+        $this->game->setBoard('-1,2', 'B');
+        $this->game->setBoard('0,2', 'B');
+        $this->game->setBoard('1,1', 'A');
+
+        //Action
+        $this->game->setPlayer(0);
+        $this->game->setBoard('1,0', 'A');
+
+        // Assert
+        self::assertTrue($this->game->hasWon($this->game->getBoard()));
+    }
 }
