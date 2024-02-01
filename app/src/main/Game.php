@@ -146,12 +146,6 @@ class Game
         }
     }
 
-    public function pass()
-    {
-        $this->lastMove =  $this->database->pass($this->gameId, $this->lastMove);
-        $this->player = 1 - $this->player;
-    }
-
     public function restart()
     {
         $this->board = [];
@@ -249,5 +243,74 @@ class Game
             }
             $this->board = $board;
         }
+        return $this->error !== '';
+    }
+
+    public function pass()
+    {
+        if (!$this->canPlayerPass()) {
+            $this->error = 'You cannot pass';
+        } else {
+            $this->lastMove = $this->database->pass($this->gameId, $this->lastMove);
+            $this->player = 1 - $this->player;
+        }
+    }
+
+    public function canPlayerPass()
+    {
+        if (empty($this->getAllValidBoardPositions()) && count($this->hand[$this->player]) !== 0) {
+            return false;
+        }
+
+        foreach ($this->board as $position) {
+            if ($position[0][0] == $this->player) {
+                foreach ($this->getAllBoardPositions() as $possiblePosition => $keyTo) {
+                    if ($this->move($keyTo, $possiblePosition)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public function getAllBoardPositions()
+    {
+        $toPositions = [];
+        foreach ($GLOBALS['OFFSETS'] as $pq) {
+            foreach (array_keys($this->board) as $pos) {
+                $pq2 = explode(',', $pos);
+                $toPositions[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
+            }
+        }
+        $toPositions = array_unique($toPositions);
+        if (!count($toPositions)) $toPositions[] = '0,0';
+
+        return $toPositions;
+    }
+
+    public function getAllValidBoardPositions()
+    {
+        $allPositions = $this->getAllBoardPositions();
+        $validPositions = array_filter($allPositions, [$this, 'validPosition']);
+        return array_values($validPositions);
+    }
+
+    public function validPosition($position)
+    {
+        if (isset($this->board[$position])) {
+            return false;
+        }
+
+        if (!$this->gameLogic->hasNeighBour($position, $this->board)) {
+            return false;
+        }
+        if (array_sum($this->hand[$this->player]) < 11 && !$this->gameLogic->neighboursAreSameColor($this->player, $position, $this->board)) {
+            return false;
+        }
+        if (array_sum($this->hand[$this->player]) <= 8 && $this->hand[$this->player]['Q']) {
+            return false;
+        }
+        return true;
     }
 }
