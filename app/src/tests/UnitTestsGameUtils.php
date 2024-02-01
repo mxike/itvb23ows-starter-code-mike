@@ -46,7 +46,6 @@ class UnitTestsGameUtils extends TestCase
 
         // Action
         $this->game->move("-1,0", "3,0");
-        $this->game->pass(); // pass for black
         $this->game->setPlayer(0); // set player to white
         $this->game->move("3,0", "2,1");
 

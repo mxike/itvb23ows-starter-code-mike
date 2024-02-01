@@ -18,6 +18,8 @@ services:
     build: ./database/
     restart: always
     container_name: database_hive_mike
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_DATABASE: hive
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -54,6 +56,17 @@ services:
       hive-network:
         aliases:
           - sonarqube
+
+  hive-ai:
+    build: ./hive-ai/
+    container_name: hive_ai_mike
+    command: flask --app app run --debug
+    ports:
+      - "5000:5000"
+    networks:
+      hive-network:
+        aliases:
+          - hive-ai
 
 networks:
   hive-network:
