@@ -13,7 +13,8 @@ $game = new Game($db, $GameLogic);
 $game->waitAction();
 
 if (!isset($_SESSION['board'])) {
-    header('Location: restart.php');
+    $game->restart();
+    header('Location: index.php');
     exit(0);
 }
 
@@ -29,7 +30,6 @@ foreach ($GLOBALS['OFFSETS'] as $pq) {
         $toPosition[] = ($pq[0] + $pq2[0]) . ',' . ($pq[1] + $pq2[1]);
     }
 }
-
 
 $toPosition = array_unique($toPosition);
 if (!count($toPosition)) $toPosition[] = '0,0';
@@ -154,6 +154,15 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="submit" value="Restart">
     </form>
 
+    <form method="post">
+        <input type="hidden" name="action" value="play_ai">
+        <input type="submit" value="Play_ai">
+    </form>
+    <form method="post" action="undo.php">
+        <input type="hidden" name="action" value="undo">
+        <input type="submit" value="Undo">
+    </form>
+
     <strong><?php if (isset($_SESSION['error'])) echo ($_SESSION['error']); ?></strong>
 
     <ol>
@@ -165,10 +174,6 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         ?>
     </ol>
 
-    <form method="post" action="undo.php">
-        <input type="hidden" name="action" value="undo">
-        <input type="submit" value="Undo">
-    </form>
 
 </body>
 

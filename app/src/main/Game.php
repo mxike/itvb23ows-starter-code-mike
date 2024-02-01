@@ -69,6 +69,8 @@ class Game
                 case 'undo':
                     $this->undo();
                     break;
+                case 'play_ai':
+                    $this->playAi();
             }
             if ($this->hasWon($this->board)) {
                 if ($this->player === 0) echo "WHITE IS THE WINNER!!";
@@ -342,7 +344,7 @@ class Game
         return false;
     }
 
-    private function countNeighbours($board, $position, $player)
+    public function countNeighbours($board, $position, $player)
     {
         $neighbourCount = 0;
         $positionCoord = explode(',', $position);
@@ -357,8 +359,50 @@ class Game
         return $neighbourCount;
     }
 
-    private function isDraw($neighbourCount, $neighbourCountOpponent)
+    public function isDraw($neighbourCount, $neighbourCountOpponent)
     {
         return $neighbourCount === 6 && $neighbourCountOpponent === 6;
+    }
+
+    public function playAi(): void
+    {
+        $url = "http://hive-ai:5000";
+
+        $requestData = [
+            "hand" => $this->hand,
+            "board" => $this->board,
+            "player" => $this->player,
+        ];
+
+        $options = [
+            "http" => [
+                "header" => "Content-Type: application/json\r\n",
+                "method" => "POST",
+                "content" => json_encode($requestData)
+            ]
+        ];
+
+        $response = json_decode(@file_get_contents($url, false, stream_context_create($options)));
+
+        if ($response !== false) {
+
+            [$action, $param1, $param2] = $response;
+
+            switch ($action) {
+                case "play":
+                    $this->play($param1, $param2);
+                    break;
+                case "move":
+                    $this->move($param1, $param2);
+                    break;
+                case "pass":
+                    $this->pass();
+                    break;
+                default:
+                    $this->error = "error Hive-AI";
+            }
+        } else {
+            $this->error = "Unable to connect to the Hive-AI.";
+        }
     }
 }
