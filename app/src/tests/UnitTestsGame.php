@@ -184,4 +184,54 @@ class UnitTestsGame extends TestCase
         // Assert
         self::assertEquals('Move would split hive', $this->game->getError());
     }
+
+    public function test_Player_Cannot_Pass_Without_Any_Pieces_Played()
+    {
+        // Initialize
+        $this->game->setBoard('0', '0');
+        $this->game->setPlayer(0);
+        $this->game->setPlayerHand(0, ['Q' => 1, 'B' => 2, 'S' => 2, 'A' => 3, 'G' => 3]);
+
+        // Action
+        $this->game->pass(); // pass white
+
+        // Assert
+        self::assertEquals("You cannot pass", $this->game->getError());
+    }
+
+    public function test_Player_Cannot_Pass_When_Hand_Is_Not_Empty()
+    {
+        // Initialize
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('0,1', 'B');
+        $this->game->setPlayer(0); // set player to white
+        $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 1, 'S' => 2, 'A' => 3, 'G' => 3]);
+
+        // Action
+        $this->game->pass(); // pass white
+
+        // Assert
+        self::assertEquals("You cannot pass", $this->game->getError());
+    }
+
+    public function test_Player_Cannot_Pass_When_Possible_Move_Can_Be_Played()
+    {
+        // Initialize
+        $this->game->setBoard('0,0', 'Q');
+        $this->game->setBoard('0,-1', 'B');
+        $this->game->setBoard('0,-2', 'B');
+        $this->game->setPlayer(1); // set player to black
+        $this->game->setBoard('0,1', 'B');
+        $this->game->setBoard('0,2', 'B');
+        $this->game->setBoard('0,3', 'B');
+        $this->game->setPlayer(0); // set player to white
+        $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 0, 'S' => 2, 'A' => 3, 'G' => 3]);
+
+        // Action
+        $this->game->pass(); // pass white
+
+        // Assert
+        self::assertEquals("You cannot pass", $this->game->getError());
+    }
 }
