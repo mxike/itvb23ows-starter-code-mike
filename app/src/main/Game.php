@@ -70,6 +70,12 @@ class Game
                     $this->undo();
                     break;
             }
+            if ($this->hasWon($this->board)) {
+                if ($this->player === 0) echo "WHITE IS THE WINNER!!";
+                elseif ($this->player === 1) echo "BLACK IS THE WINNER!!";
+                else echo "DRAW!!";
+                return;
+            }
             $this->updatingSession();
             $this->redirect();
         }
@@ -312,5 +318,47 @@ class Game
             return false;
         }
         return true;
+    }
+
+    public function hasWon($board)
+    {
+        $allBoardPositions = $this->getAllBoardPositions();
+        $opponent = 1 - $this->player;
+
+        foreach ($allBoardPositions as $position) {
+            $neigbourCount = $this->countNeighbours($board, $position, $this->player);
+            $neigbourCountOpponent = $this->countNeighbours($board, $position, $opponent);
+
+            if ($neigbourCount === 6) {
+                return true;
+            } elseif ($neigbourCountOpponent === 6) {
+                return true;
+            }
+        }
+
+        if ($this->isDraw($neigbourCount, $neigbourCountOpponent)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function countNeighbours($board, $position, $player)
+    {
+        $neighbourCount = 0;
+        $positionCoord = explode(',', $position);
+
+        foreach ($GLOBALS['OFFSETS'] as $offset) {
+            $neighbour = ($positionCoord[0] + $offset[0]) . ',' . ($positionCoord[1] + $offset[1]);
+
+            if (isset($board[$neighbour]) && isset($board[$neighbour][0][1]) == 'Q' && isset($board[$neighbour][0][0]) == $player) {
+                $neighbourCount++;
+            }
+        }
+        return $neighbourCount;
+    }
+
+    private function isDraw($neighbourCount, $neighbourCountOpponent)
+    {
+        return $neighbourCount === 6 && $neighbourCountOpponent === 6;
     }
 }
