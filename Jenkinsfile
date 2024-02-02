@@ -16,6 +16,7 @@ pipeline {
                     sh 'composer install'
                     sh 'vendor/bin/phpunit tests/'
                 }
+            }
         }
 
         stage('SonarQube Analysis') {
