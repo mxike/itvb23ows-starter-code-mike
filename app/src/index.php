@@ -7,7 +7,7 @@ use main\GameLogic;
 
 require_once './vendor/autoload.php';
 
-$db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+$db = new DatabaseHandler('database', 'root', '', 'hive');
 $GameLogic = new GameLogic();
 $game = new Game($db, $GameLogic);
 $game->waitAction();
@@ -35,7 +35,7 @@ $toPosition = array_unique($toPosition);
 if (!count($toPosition)) $toPosition[] = '0,0';
 ?>
 <!DOCTYPE html>
-<html>
+<html xml:lang="en">
 
 <head>
     <title>Hive</title>
