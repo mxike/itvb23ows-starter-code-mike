@@ -11,7 +11,8 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
+                echo 'Running unit tests...'
+                sh 'phpunit tests/'
             }
         }
 
