@@ -12,7 +12,8 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                sh 'phpunit tests/'
+                sh 'composer install'
+                sh 'vendor/bin/phpunit tests/'
             }
         }
 
