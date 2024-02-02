@@ -10,11 +10,6 @@ pipeline {
         }
 
         stage('Test') {
-            agent {
-                docker {
-                    image 'composer:lts'
-                }
-            }
             steps {
                 dir('./app/src') {
                     sh 'composer install'
