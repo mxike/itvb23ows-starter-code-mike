@@ -7,9 +7,9 @@ use main\GameLogic;
 
 require_once './vendor/autoload.php';
 
-$db = new DatabaseHandler('database', 'root', '', 'hive');
-$GameLogic = new GameLogic();
-$game = new Game($db, $GameLogic);
+$db = new DatabaseHandler('localhost', 'root', 'password', 'hive');
+$gameLogic = new GameLogic();
+$game = new Game($db, $gameLogic);
 $game->waitAction();
 
 if (!isset($_SESSION['board'])) {
