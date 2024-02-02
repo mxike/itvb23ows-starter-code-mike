@@ -16,8 +16,11 @@ pipeline {
                 }
             }
             steps {
-                sh 'composer install'
-                sh 'vendor/bin/phpunit app/src/.'
+                dir('./app/src') {
+                    sh 'composer install'
+                }
+                sh 'vendor/bin/phpunit app/src/tests/UnitTestsGame.php'
+                sh 'vendor/bin/phpunit app/src/tests/UnitTestsGameUtils.php'
             }
         }
 
