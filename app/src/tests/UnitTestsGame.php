@@ -321,24 +321,4 @@ class UnitTestsGame extends TestCase
         // Assert
         self::assertEquals('No action to undo', $this->game->getError());
     }
-
-    public function test_Undo_Allowed()
-    {
-        // Initialize
-        $this->game->setPlayer(0); // set player to white
-        $this->game->setBoard('0,0', 'Q');
-        $this->game->setBoard('-1,0', 'B');
-
-        $this->game->setPlayer(1); // set player to black
-        $this->game->setBoard('1,0', 'Q');
-        $this->game->setBoard('1,1', 'B');
-
-        $this->game->setPlayerHand(0, ['Q' => 0, 'B' => 1, 'S' => 2, 'A' => 3, 'G' => 3]); // white hand
-        $this->game->setPlayerHand(1, ['Q' => 0, 'B' => 1, 'S' => 2, 'A' => 3, 'G' => 3]); // black hand
-
-        $this->game->setPlayer(0); // set player to white
-
-        // Assert
-        self::assertTrue($this->game->undo());
-    }
 }

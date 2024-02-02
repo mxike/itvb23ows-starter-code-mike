@@ -29,8 +29,7 @@ class Game
         $this->hand = $_SESSION['hand'];
         $this->player = $_SESSION['player'];
         $this->board = $_SESSION['board'];
-        $this->gameId = $_SESSION['game_id'];
-        $this->lastMove = $_SESSION['lastMove'] ?? null;
+        $this->lastMove = $_SESSION['last_move'] ?? null;
         $this->error = $_SESSION['error'] ?? null;
     }
 
@@ -166,7 +165,31 @@ class Game
 
     public function undo()
     {
-        // TODO LATER SINCE THERE IS A BUG IN THERE
+        if (!empty($this->board)) {
+            $currentAction = $this->database->getUndoMove($this->lastMove);
+
+            if ($currentAction[5] !== null) {
+                $prevAction = $this->database->getUndoMove($currentAction[5]);
+
+                $this->database->deleteAction($this->lastMove);
+
+                list($hand, $board, $player) = unserialize($currentAction[6]);
+
+                $this->hand = $hand;
+                $this->board = $board;
+                $this->player = $player;
+                $this->lastMove = $prevAction[0];
+                $this->error = '';
+
+                return true;
+            } else {
+                $this->error = "No action to undo";
+            }
+        } else {
+            $this->error = "Cannot undo when there are no pieces on the board";
+        }
+
+        return false;
     }
 
     public function move($fromPosition, $toPosition)

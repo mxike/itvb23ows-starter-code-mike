@@ -55,14 +55,26 @@ class DatabaseHandler
 
     public function getMoves($gameId)
     {
-        $stmt = $this->connection->prepare('SELECT * FROM moves WHERE game_id = ' . $gameId);
+        $stmt = $this->connection->prepare('SELECT * FROM moves WHERE game_id = ?');
+        $stmt->bind_param('i', $gameId);
         $stmt->execute();
         return $stmt->get_result();
     }
 
-    public function undo()
+
+    public function getUndoMove($prevMove)
     {
-        // TODO
+        $stmt = $this->connection->prepare('SELECT * FROM moves WHERE id = ?');
+        $stmt->bind_param('i', $prevMove);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_array();
+    }
+
+    public function deleteAction($id)
+    {
+        $stmt = $this->connection->prepare('DELETE FROM moves WHERE id = ?');
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
     }
 
     public function getState()

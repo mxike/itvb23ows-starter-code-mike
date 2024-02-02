@@ -158,7 +158,7 @@ if (!count($toPosition)) $toPosition[] = '0,0';
         <input type="hidden" name="action" value="play_ai">
         <input type="submit" value="Play_ai">
     </form>
-    <form method="post" action="undo.php">
+    <form method="post">
         <input type="hidden" name="action" value="undo">
         <input type="submit" value="Undo">
     </form>
