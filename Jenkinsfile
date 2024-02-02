@@ -10,12 +10,14 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                echo "running tests";
-                dir('./app/src') {
-                    sh 'composer require phpunit/php-timer'
-                    sh 'phpunit /tests'
+            agent {
+                docker {
+                    image 'composer:lts'
                 }
+            }
+            steps {
+                sh 'composer install'
+                sh 'vendor/bin/phpunit app/src/.'
             }
         }
 
