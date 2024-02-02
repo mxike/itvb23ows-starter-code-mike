@@ -12,9 +12,10 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                sh 'composer install'
-                sh 'vendor/bin/phpunit tests/'
-            }
+                dir('app/src/') {
+                    sh 'composer install'
+                    sh 'vendor/bin/phpunit tests/'
+                }
         }
 
         stage('SonarQube Analysis') {
