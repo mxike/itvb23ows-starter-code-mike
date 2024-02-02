@@ -12,7 +12,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo "running tests";
-                dir('app/src') {
+                dir('./app/src') {
                     sh 'composer install phpunit'
                     sh 'phpunit /tests'
                 }
