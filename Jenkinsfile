@@ -12,11 +12,9 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running unit tests...'
-                script {
-                    docker.image('composer:lts').inside {
-                        sh 'app/src/composer install'
-                        sh 'vendor/bin/phpunit app/src/tests/.'
-                    }
+                docker.image('composer:lts').inside {
+                    sh 'app/src/composer install'
+                    sh 'vendor/bin/phpunit app/src/tests/.'
                 }
             }
         }
