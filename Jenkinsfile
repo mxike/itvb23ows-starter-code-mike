@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo "running tests";
                 dir('./app/src') {
-                    sh 'composer install phpunit'
+                    sh 'composer require phpunit/php-timer'
                     sh 'phpunit /tests'
                 }
             }
